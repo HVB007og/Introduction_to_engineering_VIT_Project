@@ -1,6 +1,13 @@
 import math
 
 
+def check_movement_in_history(to_check_movement):
+    for movement in movehistory:
+        if to_check_movement == list([movement[0], movement[1]]):
+            return True
+    else:
+        return False
+
 def is_junc(cord):
     possible_places, dir2 = check_walls(cord)
     if possible_places > 2:
@@ -13,6 +20,11 @@ def printmaze(iter):
     temp = list(maze)
     temp[currentpos[0]][currentpos[1]] = iter
     for line in temp:
+        print(*line)
+
+
+def printlist(list):
+    for line in list:
         print(*line)
 
 
@@ -68,7 +80,7 @@ def length(x, y):
 
 def check_optimal_move():
     global lastpos
-    # print("called check optimal move")
+    print("called check optimal move")
     lengths = []
     if dir[0] == 1:
         lengths.append([0, length(-2, 0)])
@@ -83,14 +95,14 @@ def check_optimal_move():
     second_optimal = [0, 0]
     least = 100000000000
     secondleast = 100000000000
-    # print('com lengths:',lengths)
+    # print('com lengths:', lengths)
     for i in lengths:
         if i[1] < least:
             current_optimal = list(i)
             least = i[1]
             lengths.pop(lengths.index(i))
 
-    # print('com lengths:',lengths)
+    # print('com lengths:', lengths)
     if len(lengths) == 1:
         second_optimal = list(lengths[0])
     else:
@@ -109,9 +121,10 @@ def check_optimal_move():
 
 
 def movepos(d):
+    global currentpos, lastpos
     print("movepos called:", d)
 
-    global currentpos, lastpos
+    movehistory.append([currentpos, lastpos, d])
     lastpos = list(currentpos)
     if d == 0:
         currentpos = list([currentpos[0] - 2, currentpos[1]])
@@ -122,7 +135,6 @@ def movepos(d):
     elif d == 3:
         currentpos = list([currentpos[0], currentpos[1] + 2])
 
-
 def jump_to_last_junc():
     print("called jump_to_last_junc()")
     global currentpos, lastpos, movehistory
@@ -130,18 +142,18 @@ def jump_to_last_junc():
         if is_junc(i[0]):
             pass
 
-        wallcord = getcord(lastjunc[2], 1, lastpos)
+        wallcord = getcord(i[2], 1, lastpos)
         print(wallcord)
         maze[wallcord[0]][wallcord[1]] = 1
-        currentpos = list(lastjunc[0])
-        print(lastjunc)
-        lastpos = list(lastjunc[1])
+        currentpos = list(i[0])
+        print(i)
+        lastpos = list(i[1])
 
-    i = int()
-    for i in range(len(movehistory)):
-        if movehistory[i][0] == lastjunc[0]:
-            movehistory = list(movehistory[0:i])
-            break
+    # i = int()
+    # for i in range(len(movehistory)):
+    #     if movehistory[i][0] == i[0]:
+    #         movehistory = list(movehistory[0:i])
+    #         break
 
 
 # maze = eval(input())
@@ -156,29 +168,36 @@ maze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
         [0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
         [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
-lastjunc = [[], [], int()]
+
+
+# lastjunc = [[], [], int()]
 lastpos = [5, 1]
 currentpos = [5, 1]  # starting position
 finalpos = [5, 13]  # final position
-movehistory = [[[], []], [[], []]]
+movehistory = []    # [[[], [], int()], [[], [], int()]]
 run = True
 i = 0
 
-while run and i < 50:
-    printmaze(i)
+while run and i < 15:
+    # printmaze(i)
 
-    if [currentpos, lastpos] in movehistory:
+    print(f"\n\n{i}.history:")
+    printlist(movehistory)
+    print("\n\n")
+
+    if check_movement_in_history([currentpos, lastpos]):    # For infinite loop
         print('***************Infinite loop!***************')
         jump_to_last_junc()
-    movehistory.append([currentpos, lastpos])
+        i += 1
+        continue
 
-    if currentpos == finalpos:
+    if currentpos == finalpos:  # When Maze solved
         break
 
-    print('\n', i, currentpos, 'last:', lastpos)
+    print('\n', i, currentpos, 'last:', lastpos) # Debug
 
     noplaces, dir = check_walls()
-    print('2:', noplaces, dir)
+    print('2:', noplaces, dir) # Debug
 
     if noplaces == 1:
         print('moving w/o option')
@@ -205,13 +224,13 @@ while run and i < 50:
         if fallbackdir1 == -1:
             pass
         if lastpos == getcord(dir1, 2):
-            lastjunc = list([list(currentpos), list(lastpos), fallbackdir1])
+            # lastjunc = list([list(currentpos), list(lastpos), fallbackdir1])
             movepos(fallbackdir1)
 
         else:
-            lastjunc = list([list(currentpos), list(lastpos), dir1])
+            # lastjunc = list([list(currentpos), list(lastpos), dir1])
             movepos(dir1)
-        print('last junction:', lastjunc)
+        # print('last junction:', lastjunc)
 
     else:
         # run backtrack program
