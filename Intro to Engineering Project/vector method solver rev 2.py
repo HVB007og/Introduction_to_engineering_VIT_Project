@@ -221,4 +221,3 @@ while run and i < 50:
         else:
             movepos(dir1)
         i += 1
-    # i += 1
