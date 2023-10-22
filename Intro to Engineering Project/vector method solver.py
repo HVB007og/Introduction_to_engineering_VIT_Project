@@ -2,25 +2,26 @@ import math
 
 
 def is_junc(cord):
-    possible_places, dir = check_walls(cord)
+    possible_places, dir2 = check_walls(cord)
     if possible_places > 2:
         return True
     else:
         pass
 
+
 def printmaze(iter):
     temp = list(maze)
     temp[currentpos[0]][currentpos[1]] = iter
-    for i in temp:
-        print(*i)
+    for line in temp:
+        print(*line)
 
 
-def getcord(d,x,p = []):
-
-    if p == []:
+def getcord(d,x,p = None):
+    if p is None:
         pos = currentpos
     else:
         pos = p
+
     if d == 0:
         return [pos[0]-x, pos[1]]
     elif d == 1:
@@ -32,25 +33,26 @@ def getcord(d,x,p = []):
 
 
 def check_walls(posi = 0):
+    global posin
     if posi == 0:
-        pos = list(currentpos)
-    dir = [0,0,0,0]
+        posin: list[int] = list(currentpos)
+    direction = [0, 0, 0, 0]
     possible_places = 0
 
-    if maze[(pos[0] - 1)][pos[1]] == 0: # up
+    if maze[(posin[0] - 1)][posin[1]] == 0: # up
         possible_places += 1
-        dir[0] = 1
-    if maze[(pos[0] + 1)][pos[1]] == 0:  # down
+        direction[0] = 1
+    if maze[(posin[0] + 1)][posin[1]] == 0:  # down
         possible_places += 1
-        dir[1] = 1
-    if maze[pos[0]][(pos[1] - 1)] == 0:  # left
+        direction[1] = 1
+    if maze[posin[0]][(posin[1] - 1)] == 0:  # left
         possible_places += 1
-        dir[2] = 1
-    if maze[pos[0]][(pos[1] + 1)] == 0:  # right
+        direction[2] = 1
+    if maze[posin[0]][(posin[1] + 1)] == 0:  # right
         possible_places += 1
-        dir[3] = 1
+        direction[3] = 1
 
-    return possible_places, dir
+    return possible_places, direction
 
 
 def length(x,y):
@@ -157,13 +159,16 @@ lastjunc = [[],[],int()]
 lastpos = [5,1]
 currentpos = [5,1] # starting position
 finalpos = [5,13] # final position
-movehistory = [[[],[]], [[],[]]]
+movehistory = [ [[],[]]  ,  [[],[]] ]
 run = True
 i = 0
 
 
 while run and i<50:
     printmaze(i)
+
+
+
     if [currentpos,lastpos] in movehistory:
         print('***************Infinite loop!***************')
         jump_to_last_junc()
@@ -186,6 +191,7 @@ while run and i<50:
         movepos(dir.index(1))
         i+=1
         continue
+
     elif noplaces == 2:
         print('moving w/o option - 2')
         dir1, fallbackdir1 = check_optimal_move()
@@ -193,7 +199,6 @@ while run and i<50:
             movepos(fallbackdir1)
         else:
             movepos(dir1)
-
 
     elif noplaces > 2:
         print('moving w/o option - 3')
@@ -210,8 +215,8 @@ while run and i<50:
             lastjunc = list([list(currentpos), list(lastpos),dir1])
             movepos(dir1)
         print('last junction:',lastjunc)
-    else:
 
+    else:
         #run backtrack program
         pass
 
