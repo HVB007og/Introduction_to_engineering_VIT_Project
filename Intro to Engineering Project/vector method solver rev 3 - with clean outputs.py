@@ -1,4 +1,5 @@
 import math
+import time
 
 
 def check_in_history(coord):
@@ -47,7 +48,7 @@ def jump_to_last_junc():
     else:
         # condition when no feasible path to final
         print("no path")
-        pass
+        return -1
 
 
 def printlist(list):  # For debugging
@@ -211,12 +212,13 @@ currentpos = [5, 1]  # starting position
 # finalpos = eval(input())
 finalpos = [5, 13]  # final position
 
-current_direction = 1
+current_direction = 1   # For final human interpretable directions
 
 lastpos = list(currentpos)
 movehistory = []  # [[[], [], int()], [[], [], int()]]
 logichistory = []
 
+solved = False
 run, i = True, int()
 while run and i < 50:
     print("****************************************************************"
@@ -227,18 +229,24 @@ while run and i < 50:
     if currentpos == finalpos:
         print("Maze solved optimally!")
         print("shortest distance = ", len(movehistory), '\n')
+        solved = True
         break
 
     if check_in_history(currentpos):
-        jump_to_last_junc()
+        if jump_to_last_junc() == -1:
+            break
         pass
 
     noplaces, dir = check_walls()
     print('Check walls output', noplaces, dir)
 
+    if noplaces == 0:
+        break
+
     if noplaces == 1:
         if lastpos == getcord(dir.index(1), 2):
-            jump_to_last_junc()
+            if jump_to_last_junc() == -1:
+                break
             continue
         movepos(dir.index(1))
         i += 1
@@ -257,7 +265,12 @@ while run and i < 50:
         else:
             movepos(dir1)
         i += 1
+    # time.sleep(1)
 
-print_clear_directions(movehistory)
-print("\nlogic Directions:")
-print_clear_directions(logichistory)
+
+if solved:
+    print_clear_directions(movehistory)
+# print("\nlogic Directions:")
+# print_clear_directions(logichistory)
+else:
+    print("Maze Not Solvable!")
