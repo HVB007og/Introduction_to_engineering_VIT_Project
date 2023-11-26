@@ -234,7 +234,7 @@ logichistory = []
 dir = []
 listfinaldir = []
 
-def SolveMaze(m=None, s=None, f=None):
+def SolveMaze(m=None, s=[5, 1], f=[5, 13]):
     if m is None or s is None or f is None:
         return -1
 
