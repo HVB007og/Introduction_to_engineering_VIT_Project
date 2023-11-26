@@ -1,5 +1,5 @@
 import math
-import time
+# import time
 
 
 def check_in_history(coord):
@@ -187,6 +187,25 @@ def change_direction(direction):
         return 'Turn around'
     pass
 
+def change_directionforrobot(direction):
+    global current_direction
+    # print(current_direction, direction, ':', end='')
+    if current_direction == 0 and direction == 0 or current_direction == 1 and direction == 3 or \
+            current_direction == 2 and direction == 1 or current_direction == 3 and direction == 2:
+        return 0
+    if current_direction == 0 and direction == 3 or current_direction == 1 and direction == 1 or \
+            current_direction == 2 and direction == 2 or current_direction == 3 and direction == 0:
+        current_direction = (current_direction + 1) % 4
+        return 1
+    if current_direction == 0 and direction == 2 or current_direction == 1 and direction == 0 or \
+            current_direction == 2 and direction == 3 or current_direction == 3 and direction == 1:
+        current_direction = (current_direction + 3) % 4
+        return 2
+    if current_direction == 0 and direction == 1 or current_direction == 1 and direction == 2 or \
+            current_direction == 2 and direction == 0 or current_direction == 3 and direction == 3:
+        current_direction = (current_direction + 2) % 4
+        return 3
+    pass
 
 def print_clear_directions(history):
     for item in history:
@@ -194,84 +213,120 @@ def print_clear_directions(history):
         print(change_direction(item[2]), 'and move forward once')
     pass
 
+def makelistfinaldir(history):
+    for item in history:
+        listfinaldir.append(change_directionforrobot(item[2]))
+    return listfinaldir
 
-# maze = eval(input())  #Input Maze in a bit matrix(even i , even j values are points dont matter in logic)
-maze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
-        [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-        [1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1],
-        [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
-        [0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
 
-# currentpos = eval(input())
-currentpos = [5, 1]  # starting position
-# finalpos = eval(input())
-finalpos = [5, 13]  # final position
 
-current_direction = 1   # For final human interpretable directions
+
+
+maze = [0]
+currentpos = [0]
+finalpos = [0]
+
+current_direction = 1  # For final human interpretable directions
 
 lastpos = list(currentpos)
 movehistory = []  # [[[], [], int()], [[], [], int()]]
 logichistory = []
+dir = []
+listfinaldir = []
 
-solved = False
-run, i = True, int()
-while run and i < 50:
-    print("****************************************************************"
-          "\n", i, "data:", currentpos, lastpos, "\n\nHistory:")
-    printlist(movehistory)
-    print()
+def SolveMaze(m=None, s=None, f=None):
+    if m is None or s is None or f is None:
+        return -1
 
-    if currentpos == finalpos:
-        print("Maze solved optimally!")
-        print("shortest distance = ", len(movehistory), '\n')
-        solved = True
-        break
+    global maze
+    global currentpos
+    global finalpos
+    global current_direction
+    global lastpos
+    global movehistory
+    global logichistory
+    global dir
+    global listfinaldir
 
-    if check_in_history(currentpos):
-        if jump_to_last_junc() == -1:
+    maze = m
+    currentpos = s  # starting position
+    finalpos = f  # final position
+
+    current_direction = 1  # For final human interpretable directions
+
+    lastpos = list(currentpos)
+    movehistory = []
+    logichistory = []
+
+    solved = False
+    run, i = True, int()
+    while run and i < 2000:
+        print("****************************************************************"
+              "\n", i, "data:", currentpos, lastpos, "\n\nHistory:")
+        printlist(movehistory)
+        print()
+
+        if currentpos == finalpos:
+            print("Maze solved optimally!")
+            print("shortest distance = ", len(movehistory), '\n')
+            solved = True
             break
-        pass
 
-    noplaces, dir = check_walls()
-
-    if noplaces == 0:
-        break
-
-    if noplaces == 1:
-        if lastpos == getcord(dir.index(1), 2):
+        if check_in_history(currentpos):
             if jump_to_last_junc() == -1:
                 break
-            continue
-        movepos(dir.index(1))
-        i += 1
+            pass
 
-    elif noplaces == 2:
-        dir1, fallbackdir1 = check_optimal_move()
-        if lastpos == getcord(dir1, 2):
-            movepos(fallbackdir1)
-        else:
-            movepos(dir1)
-        i += 1
-    elif noplaces > 2:
-        dir1, fallbackdir1 = check_optimal_move()
-        if lastpos == getcord(dir1, 2):
-            movepos(fallbackdir1)
-        else:
-            movepos(dir1)
-        i += 1
-    # time.sleep(1)
+        noplaces, dir = check_walls()
+        print('Check walls output', noplaces, dir)
+
+        if noplaces == 0:
+            break
+
+        if noplaces == 1:
+            if lastpos == getcord(dir.index(1), 2):
+                if jump_to_last_junc() == -1:
+                    break
+                continue
+            movepos(dir.index(1))
+            i += 1
+
+        elif noplaces == 2:
+            dir1, fallbackdir1 = check_optimal_move()
+            if lastpos == getcord(dir1, 2):
+                movepos(fallbackdir1)
+            else:
+                movepos(dir1)
+            i += 1
+        elif noplaces > 2:
+            dir1, fallbackdir1 = check_optimal_move()
+            if lastpos == getcord(dir1, 2):
+                movepos(fallbackdir1)
+            else:
+                movepos(dir1)
+            i += 1
+        # time.sleep(1)
+
+    if solved:
+        print_clear_directions(movehistory)
+        return (makelistfinaldir(movehistory))
 
 
-
-if solved:
-    print_clear_directions(movehistory)
-else:
-    print("Maze Not Solvable!")
-    print("\nlogic Directions:")
-    print_clear_directions(logichistory)
+# testmaze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+#             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+#             [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0],
+#             [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+#             [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+#             [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+#             [1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1],
+#             [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+#             [0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
+#             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+#             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
+#
+# teststartpos = [5, 1]
+#
+# testfinalpos = [5, 13]
+#
+#
+# print("to solve:", SolveMaze(testmaze, teststartpos, testfinalpos))
