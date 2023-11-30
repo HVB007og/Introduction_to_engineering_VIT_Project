@@ -1,4 +1,5 @@
 import math
+import  GUI2 as Guimat
 # import time
 
 
@@ -23,12 +24,16 @@ def block_wall(coord, Direction):
     print("called block_wall(coord, Direction):")
     if Direction == 0:
         maze[coord[0] - 1][coord[1]] = 1
+        BlockedPositions.append([coord[0] - 1, coord[1]])
     elif Direction == 1:
         maze[coord[0] + 1][coord[1]] = 1
+        BlockedPositions.append([coord[0] + 1, coord[1]])
     elif Direction == 2:
         maze[coord[0]][coord[1] - 1] = 1
+        BlockedPositions.append([coord[0], coord[1] - 1])
     elif Direction == 3:
         maze[coord[0]][coord[1] + 1] = 1
+        BlockedPositions.append([coord[0], coord[1] + 1])
     printlist(maze)
 
 
@@ -107,7 +112,7 @@ def check_walls(posi=0):
 
 
 def movepos(d):
-    global currentpos, lastpos
+    global currentpos, lastpos, walls_jumped
     print("movepos called:", d)
 
     movehistory.append([currentpos, lastpos, d])
@@ -115,12 +120,16 @@ def movepos(d):
     lastpos = list(currentpos)
     if d == 0:
         currentpos = list([currentpos[0] - 2, currentpos[1]])
+        walls_jumped.append(list([currentpos[0] + 1, currentpos[1]]))
     elif d == 1:
         currentpos = list([currentpos[0] + 2, currentpos[1]])
+        walls_jumped.append(list([currentpos[0] - 1, currentpos[1]]))
     elif d == 2:
         currentpos = list([currentpos[0], currentpos[1] - 2])
+        walls_jumped.append(list([currentpos[0], currentpos[1] + 1]))
     elif d == 3:
         currentpos = list([currentpos[0], currentpos[1] + 2])
+        walls_jumped.append(list([currentpos[0], currentpos[1] - 1]))
     print("after Moving:", currentpos, lastpos)
 
 
@@ -219,12 +228,23 @@ def makelistfinaldir(history):
     return listfinaldir
 
 
-
+def finalGUImatrixUpdate(maze):
+    global finalpos
+    for item in movehistory:
+        maze[item[0][0]][item[0][1]] = 3
+    for coord in walls_jumped:
+        maze[coord[0]][coord[1]] = 4
+    for coord in BlockedPositions:
+        maze[coord[0]][coord[1]] = 2
+    maze[finalpos[0]][finalpos[1]] = 3
+    pass
 
 
 maze = [0]
 currentpos = [0]
 finalpos = [0]
+BlockedPositions = []
+walls_jumped = []
 
 current_direction = 1  # For final human interpretable directions
 
@@ -234,19 +254,11 @@ logichistory = []
 dir = []
 listfinaldir = []
 
-def SolveMaze(m=None, s=[5, 1], f=[5, 13]):
+def SolveMaze(m = None, s = [5, 1], f = [5, 13]):
     if m is None or s is None or f is None:
         return -1
 
-    global maze
-    global currentpos
-    global finalpos
-    global current_direction
-    global lastpos
-    global movehistory
-    global logichistory
-    global dir
-    global listfinaldir
+    global maze, currentpos, finalpos, current_direction, lastpos, movehistory, logichistory, dir, listfinaldir
 
     maze = m
     currentpos = s  # starting position
@@ -312,21 +324,29 @@ def SolveMaze(m=None, s=[5, 1], f=[5, 13]):
         return (makelistfinaldir(movehistory))
 
 
-# testmaze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-#             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-#             [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0],
-#             [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
-#             [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
-#             [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-#             [1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1],
-#             [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
-#             [0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
-#             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-#             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
-#
-# teststartpos = [5, 1]
-#
-# testfinalpos = [5, 13]
-#
-#
-# print("to solve:", SolveMaze(testmaze, teststartpos, testfinalpos))
+testmaze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+            [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1],
+            [0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+            [0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
+
+teststartpos = [5, 1]
+
+testfinalpos = [5, 13]
+
+Guimat.show_bit_matrix(testmaze)
+
+print("to solve:", SolveMaze(testmaze, teststartpos, testfinalpos))
+# print(BlockedPositions)
+# print(movehistory)
+
+
+finalGUImatrixUpdate(testmaze)
+# printlist(testmaze)
+Guimat.show_bit_matrix(testmaze)

@@ -1,12 +1,7 @@
-i = 12
+list = "India is having rich culture in whole world."
+x=0
+for i in list:
+    if i in "aeiouAEIOU":
+        x+=1
 
-if i>3:
-    print("1")
-elif i<13:
-    print("2")
-elif i == 13:
-    print("3")
-elif i >= 12:
-    print("4")
-else:
-    print("5")
+print(x)
