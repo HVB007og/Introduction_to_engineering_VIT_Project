@@ -1,6 +1,6 @@
 import math
 import  GUI2 as Guimat
-# import time
+import time
 
 
 def check_in_history(coord):
@@ -15,7 +15,7 @@ def check_in_history(coord):
 
 def check_Junction(coord):
     noplaces2, dir2 = check_walls(coord)
-    if noplaces2 > 2:
+    if noplaces2 >= 2:
         return True
     return False
 
@@ -41,7 +41,7 @@ def jump_to_last_junc():
     global currentpos, lastpos, movehistory
     print("called jump_to_last_junc():")
     for movement in movehistory[::-1]:
-        print('  ', movement, check_Junction(movement[0]))
+        print(' this', movement, check_Junction(movement[0]))
         if check_Junction(movement[0]):
             movehistory = list(movehistory[0: movehistory.index(movement)])
             print("new move history:")
@@ -217,9 +217,11 @@ def change_directionforrobot(direction):
     pass
 
 def print_clear_directions(history):
+    print("Initial Position:", startpos)
     for item in history:
-        print(item[0])
+        print(item[0], end = ': ')
         print(change_direction(item[2]), 'and move forward once')
+    print("Final Position:", finalpos)
     pass
 
 def makelistfinaldir(history):
@@ -242,6 +244,7 @@ def finalGUImatrixUpdate(maze):
 
 maze = [0]
 currentpos = [0]
+startpos = []
 finalpos = [0]
 BlockedPositions = []
 walls_jumped = []
@@ -258,8 +261,9 @@ def SolveMaze(m = None, s = [5, 1], f = [5, 13]):
     if m is None or s is None or f is None:
         return -1
 
-    global maze, currentpos, finalpos, current_direction, lastpos, movehistory, logichistory, dir, listfinaldir
+    global maze, currentpos, finalpos, current_direction, lastpos, movehistory, logichistory, dir, listfinaldir, startpos
 
+    startpos = s
     maze = m
     currentpos = s  # starting position
     finalpos = f  # final position
@@ -320,7 +324,9 @@ def SolveMaze(m = None, s = [5, 1], f = [5, 13]):
         # time.sleep(1)
 
     if solved:
+        print("Human Readable Directions with coordinates:")
         print_clear_directions(movehistory)
+        print("\n\n")
         return (makelistfinaldir(movehistory))
 
 
@@ -336,13 +342,58 @@ testmaze = [[0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]]
 
+
+# testmaze = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+#             [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+#             [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+#             [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+#             [1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
+#             [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+#             [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+#             [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+#             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+#             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+
+
+
+
+# testmaze = [
+#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#     [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+#     [1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1],
+#     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+#     [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+#     [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+#     [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+#     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+#     [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+#     [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+#     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+#     ]
+
+# testmaze = [[1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+#                      [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+#                      [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1],
+#                      [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+#                      [1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1],
+#                      [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+#                      [1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1],
+#                      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+#                      [1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
+#                      [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+#                      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+
 teststartpos = [5, 1]
+# teststartpos = [1, 1]
 
 testfinalpos = [5, 13]
+# testfinalpos = [5, 9]
+# testfinalpos = [9, 9]
 
 Guimat.show_bit_matrix(testmaze)
 
-print("to solve:", SolveMaze(testmaze, teststartpos, testfinalpos))
+print("Directions for Bot", SolveMaze(testmaze, teststartpos, testfinalpos))
 # print(BlockedPositions)
 # print(movehistory)
 
